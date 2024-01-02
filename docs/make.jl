@@ -6,7 +6,7 @@ DocMeta.setdocmeta!(OptimalTrainControl, :DocTestSetup, :(using OptimalTrainCont
 makedocs(;
     modules=[OptimalTrainControl],
     authors="Vít Fanta <fantavit@fel.cvut.cz> and contributors",
-    repo="https://github.com/vtfanta/OptimalTrainControl.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/vtfanta/OptimalTrainControl_v2.jl/blob/{commit}{path}#{line}",
     sitename="OptimalTrainControl.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
@@ -16,4 +16,8 @@ makedocs(;
     pages=[
         "Home" => "index.md",
     ],
+)
+
+deploydocs(
+    repo = "github.com/vtfanta/OptimalTrainControl_v2.jl.git",
 )
