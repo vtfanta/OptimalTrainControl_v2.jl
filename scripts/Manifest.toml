@@ -2,7 +2,7 @@
 
 julia_version = "1.9.4"
 manifest_format = "2.0"
-project_hash = "c9ef02ea7f43e9e8c40f44547f191fe09238e198"
+project_hash = "0e6952a70eb6de8872d77e1407ea22dfaa4863b4"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "41c37aa88889c171f1300ceac1313c06e891d245"
@@ -975,8 +975,8 @@ git-tree-sha1 = "01f85d9269b13fedc61e63cc72ee2213565f7a72"
 uuid = "429524aa-4258-5aef-a3af-852621145aeb"
 version = "1.7.8"
 
-[[deps.OptimalTrainControl_v2]]
-deps = ["JSON", "Optim", "OrdinaryDiffEq", "Roots", "StaticArrays"]
+[[deps.OptimalTrainControl]]
+deps = ["JSON", "Optim", "OrdinaryDiffEq", "RecipesBase", "Roots", "StaticArrays"]
 path = ".."
 uuid = "9439a33f-2b93-4fba-a0f8-3bebc99d821e"
 version = "1.0.0-DEV"

@@ -1,14 +1,15 @@
-using OptimalTrainControl_v2
+using OptimalTrainControl
+using StaticArrays
 using Test
 
 @testset "Track utilities" begin
-    t = ph.Track(
-        1e3,
-        100.0,
-        [0.0, 200.0, 500.0],
-        [0.0, 1.0, 2.0],
-        [0.0, 30.0, 600.0],
-        [80., 85., 95.]
+    t = Track(
+        length = 1e3,
+        altitude = 100.0,
+        x_gradient = [0.0, 200.0, 500.0],
+        gradient = [0.0, 1.0, 2.0],
+        x_speedlimit = [0.0, 30.0, 600.0],
+        speedlimit = [80., 85., 95.]
     )
 
     @test gradient(t, 94) ≈ 0
@@ -32,7 +33,7 @@ using Test
     @test altitude(t, 600) ≈ t.altitude + 300 + 200
     @test altitude(t, t.length) ≈ t.altitude + 300 + 2*500
 
-    @test all(ph.segmentize!(t) .≈ [0,30,200,500,600])
+    @test all(segmentize!(t) .≈ [0,30,200,500,600])
 
     @test g(t, 250) ≈ -9.81*sqrt(2)/2
 end
@@ -46,4 +47,25 @@ end
     )
 
     @test r(train, 15) ≈ 0.018
+end
+
+@testset "Time-optimal train control, flat track" begin
+    train = Train(
+        v -> 3/v,
+        v -> -3/v,
+        (6.75e-3, 0., 5e-5)
+    )
+
+    track = Track(
+        length = 300.,
+        altitude = 100.,
+        x_gradient = [0.0],
+        gradient = [2e-3]
+    )
+
+    timeprob = TOTCProblem(train, track)
+
+    sol = solve(timeprob)
+    T_end = sol.odesol.u[end][1]
+    @test isapprox(T_end, 31.41; atol=0.1)
 end

@@ -1,5 +1,7 @@
 using OrdinaryDiffEq
 
+export Mode, Train, Track, OTCSolution, TOTCProblem
+
 @enum Mode begin
     MaxP = 0
     HoldP = 1
@@ -30,6 +32,9 @@ Train(U̅, U̲, r) = Train(U̅, U̲, r, 0)
 end
 
 Track(l, a, xg, g, xsl, sl) = Track(l, a, xg, g, xsl, sl, nothing)
+
+# To allow broadcasting
+Base.broadcastable(t::Track) = Ref(t)
 
 struct OTCSolution{T<:Real}
     odesol::OrdinaryDiffEq.ODESolution

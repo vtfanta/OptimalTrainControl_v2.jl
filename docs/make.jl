@@ -1,13 +1,13 @@
-using OptimalTrainControl_v2
+using OptimalTrainControl
 using Documenter
 
-DocMeta.setdocmeta!(OptimalTrainControl_v2, :DocTestSetup, :(using OptimalTrainControl_v2); recursive=true)
+DocMeta.setdocmeta!(OptimalTrainControl, :DocTestSetup, :(using OptimalTrainControl); recursive=true)
 
 makedocs(;
-    modules=[OptimalTrainControl_v2],
+    modules=[OptimalTrainControl],
     authors="Vít Fanta <fantavit@fel.cvut.cz> and contributors",
-    repo="https://github.com/vtfanta/OptimalTrainControl_v2.jl/blob/{commit}{path}#{line}",
-    sitename="OptimalTrainControl_v2.jl",
+    repo="https://github.com/vtfanta/OptimalTrainControl.jl/blob/{commit}{path}#{line}",
+    sitename="OptimalTrainControl.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         edit_link="master",

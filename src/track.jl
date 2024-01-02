@@ -1,3 +1,5 @@
+export r, g, isvalidposition, gradient, speedlimit, altitude, segmentize!
+
 function r(train::Train, v::T) where {T<:Real}
     train.r[1] + train.r[2] * v + train.r[3] * v^2
 end
@@ -29,7 +31,7 @@ function gradient(t::Track, position::T) where {T <: Real}
         throw(ArgumentError("Position $(position) out of bounds."))
     end
     isnothing(t.x_gradient) && return(0.)
-
+    
     return t.gradient[searchsortedlast(t.x_gradient, position)]
 end
 

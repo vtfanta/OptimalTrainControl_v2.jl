@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = OptimalTrainControl_v2
+CurrentModule = OptimalTrainControl
 ```
 
-# OptimalTrainControl_v2
+# OptimalTrainControl
 
-Documentation for [OptimalTrainControl_v2](https://github.com/vtfanta/OptimalTrainControl_v2.jl).
+Documentation for [OptimalTrainControl](https://github.com/vtfanta/OptimalTrainControl.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [OptimalTrainControl_v2]
+Modules = [OptimalTrainControl]
 ```
