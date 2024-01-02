@@ -10,12 +10,12 @@ train = Train(
 track = Track(
     length = 300.,
     altitude = 100.,
-    x_gradient = [0.0],
-    gradient = [2e-3]
+    x_gradient = collect(0.:1.:300.),
+    gradient = 5e-2*sin.(collect(0.:1.:300.)./20.)
 )
 
 timeprob = TOTCProblem(;train, track)
 
 sol = solve(timeprob)
 
-plot(sol, xlabel = "Distance (m)", ylabel = "Speed (m/s)")
+plot(sol, xlabel = "Distance (m)", ylabel = "Speed (m/s)", label = false)

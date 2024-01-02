@@ -48,7 +48,7 @@ end
 
     label --> false
 
-    ylim --> (minY, 5 * (maxY - minY))
+    ylim --> (minY, maxY + 5(maxY - minY))
 
     alpha --> 0.5
 
