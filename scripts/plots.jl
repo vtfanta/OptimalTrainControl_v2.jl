@@ -17,6 +17,6 @@ track = Track(
 prob = TOTCProblem(train, track)
 
 sol = solve(prob)
-@show mode2color(sol.phases[end])
+
 plot(sol, label = false, ylabel = "Speed (m/s)", xlabel = "Distance (m)")
 plot!(twinx(), track, ylabel = "Altitude (m)")

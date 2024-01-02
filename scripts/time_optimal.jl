@@ -1,4 +1,5 @@
 using OptimalTrainControl
+using Plots
 
 train = Train(
         v -> 3/v,
@@ -13,8 +14,8 @@ track = Track(
     gradient = [2e-3]
 )
 
-timeprob = TOTCProblem(train, track)
+timeprob = TOTCProblem(;train, track)
 
 sol = solve(timeprob)
 
-plot(sol.odesol.t, sol.odesol[2,:])
+plot(sol, xlabel = "Distance (m)", ylabel = "Speed (m/s)")

@@ -44,10 +44,12 @@ struct OTCSolution{T<:Real}
 end
 
 # stands for time-optimal train control
-@kwdef mutable struct TOTCProblem{T,S,U}
+@kwdef mutable struct TOTCProblem{T,S,U,V<:AbstractFloat}
     train::Train{T,S}
     track::Track{U}
-    current_phase::Mode
+    current_phase::Mode = MaxP
+    initial_speed::V = 1.
 end
 
-TOTCProblem(train, track) = TOTCProblem(train, track, MaxP)
+TOTCProblem(train, track) = TOTCProblem(train, track, MaxP, 1.)
+TOTCProblem(train, track, mode) = TOTCProblem(train, track, mode, 1.)
