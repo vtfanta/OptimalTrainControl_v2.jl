@@ -19,7 +19,6 @@ function solve(p::TOTCProblem)
         SA[ds1, ds2]
     end
 
-    
     if isnothing(p.track.x_gradient)
         xspan = (0., p.track.length)
     else
