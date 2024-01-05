@@ -60,7 +60,7 @@ end
 
         linecolor --> :black     
         fillcolor --> :lightgray
-        fillrange := 0 
+        fillrange := minY
         X, Y
     end
     X, Y

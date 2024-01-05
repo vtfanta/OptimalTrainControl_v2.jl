@@ -1,6 +1,7 @@
 using OrdinaryDiffEq
 
-export Mode, Train, Track, OTCSolution, TOTCProblem
+export Mode, Train, Track, OTCSolution, TOTCProblem, EETCProblem
+export MaxP, HoldP, HoldR, Coast, MaxB
 
 @enum Mode begin
     MaxP = 0
@@ -19,16 +20,15 @@ end
 
 Train(U̅, U̲, r) = Train(U̅, U̲, r, 0)
 
-@kwdef mutable struct Track{T<:Real}
+@kwdef mutable struct Track{T<:Real, G<:Union{Nothing, Vector{T}},
+    S<:Union{Nothing, Vector{T}}}
     length::T
-    altitude::T = 0
-    x_gradient::Union{Nothing,Vector{T}} = nothing
-    gradient::Union{Nothing,Vector{T}} = nothing
-    x_speedlimit::Union{Nothing,Vector{T}} = nothing
-    speedlimit::Union{Nothing,Vector{T}} = nothing
+    altitude::T = 0.
+    x_gradient::G = nothing
+    gradient::G = nothing
+    x_speedlimit::S = nothing
+    speedlimit::S = nothing
     x_segments::Union{Nothing,Vector{Any}} = nothing
-
-    # Track(l, a, xg, g, xsl, sl) = new{T}(l::T, a, sg, g, xsl, sl, nothing)
 end
 
 Track(l, a, xg, g, xsl, sl) = Track(l, a, xg, g, xsl, sl, nothing)
@@ -53,3 +53,11 @@ end
 
 TOTCProblem(train, track) = TOTCProblem(train, track, MaxP, 1.)
 TOTCProblem(train, track, mode) = TOTCProblem(train, track, mode, 1.)
+
+# stands for energy-efficient train control
+@kwdef mutable struct EETCProblem{T,S,U,V<:AbstractFloat}
+    train::Train{T,S}
+    track::Track{U}
+    current_phase::Mode = MaxP
+    initial_speed::V = 1.
+end
