@@ -65,9 +65,9 @@ function solve(p::TOTCProblem)
     control = function(x)
         current_phase = phases[searchsortedlast(x_phases, x)]
         if current_phase == MaxP
-            params.U̅(sol(x)[2])
+            p.train.U̅(sol(x)[2])
         elseif current_phase == MaxB
-            params.U̲(sol(x)[2])
+            p.train.U̲(sol(x)[2])
         end
     end
 

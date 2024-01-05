@@ -55,9 +55,19 @@ TOTCProblem(train, track) = TOTCProblem(train, track, MaxP, 1.)
 TOTCProblem(train, track, mode) = TOTCProblem(train, track, mode, 1.)
 
 # stands for energy-efficient train control
-@kwdef mutable struct EETCProblem{T,S,U,V<:AbstractFloat}
-    train::Train{T,S}
-    track::Track{U}
+@kwdef mutable struct EETCProblem{TV,S,U,TG,TS,V<:AbstractFloat}
+    T::V
+    train::Train{TV,S}
+    track::Track{U,TG,TS}
     current_phase::Mode = MaxP
     initial_speed::V = 1.
+end
+
+EETCProblem(T, train, track, mode) = EETCProblem(T, train, track, mode, 1.)
+
+struct Port{T<:AbstractFloat}
+    start{T}
+    finish{T}
+    mode::Mode
+    speed{T}
 end
