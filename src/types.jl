@@ -36,12 +36,14 @@ Track(l, a, xg, g, xsl, sl) = Track(l, a, xg, g, xsl, sl, nothing)
 # To allow broadcasting
 Base.broadcastable(t::Track) = Ref(t)
 
-struct OTCSolution{T<:Real}
+struct OTCSolution{T<:Real,S<:Union{Nothing,Vector{<:Real}}}
     odesol::OrdinaryDiffEq.ODESolution
     x_phases::Vector{T}
     phases::Vector{Mode}
     control::Function
+    η::S
 end
+OTCSolution(sol, x_phases, phases, control) = OTCSolution(sol, x_phases, phases, control, nothing)
 
 # stands for time-optimal train control
 @kwdef mutable struct TOTCProblem{T,S,U,V<:AbstractFloat}
@@ -55,19 +57,20 @@ TOTCProblem(train, track) = TOTCProblem(train, track, MaxP, 1.)
 TOTCProblem(train, track, mode) = TOTCProblem(train, track, mode, 1.)
 
 # stands for energy-efficient train control
-@kwdef mutable struct EETCProblem{TV,S,U,TG,TS,V<:AbstractFloat}
+@kwdef mutable struct EETCProblem{TV,S,U,TG,TS,V<:AbstractFloat,W<:AbstractFloat}
     T::V
     train::Train{TV,S}
     track::Track{U,TG,TS}
     current_phase::Mode = MaxP
     initial_speed::V = 1.
+    Es::Vector{W} = Float64[]
 end
 
-EETCProblem(T, train, track, mode) = EETCProblem(T, train, track, mode, 1.)
+EETCProblem(T, train, track, mode) = EETCProblem(T, train, track, mode, 1., Float64[])
 
 struct Port{T<:AbstractFloat}
-    start{T}
-    finish{T}
+    start::T
+    finish::T
     mode::Mode
-    speed{T}
+    speed::T
 end

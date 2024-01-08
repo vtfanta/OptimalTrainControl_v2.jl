@@ -51,7 +51,8 @@ prob = EETCProblem(;
     train,
     track,
     current_phase = MaxP,
-    initial_speed = V
+    initial_speed = V,
+    T = 1e3
 )
 
 # low speed termination (0.5 m/s)
@@ -107,7 +108,8 @@ prob = EETCProblem(;
     train,
     track = track2,
     current_phase = MaxP,
-    initial_speed = V
+    initial_speed = V,
+    T = 1e3
 )
 
 xspan = (1943.645, 3100.)
@@ -154,3 +156,14 @@ for k in eachindex(odesol.t)
 end
 @show η[end]
 plot(odesol.t, η)
+
+plot(η, odesol[2,:])
+xlims!(-5e-3, 5e-3)
+ylims!(0, 12)
+
+##
+
+# What I need:
+#   - callback for transition from MaxP to Coast and vice versa with _neg
+#   - callback for transition from Coast to MaxB and vice versa with _neg
+#   - callback to automatically push! next E at the points of grade change
