@@ -1,8 +1,29 @@
+using DiffEqCallbacks
 using OptimalTrainControl
 using OrdinaryDiffEq
 using Plots
 using Roots
 using StaticArrays
+
+function make_update_Es(first_η)
+    last_η = first_η
+    return function update_Es!(s, x, int)
+        @show x, last_η
+        if x in int.p.track.x_gradient
+            g_prev = g(int.p.track, x - 1e-2)
+            g_next = g(int.p.track, x + 1e-2)
+            if int.p.current_phase == MaxP || int.p.current_phase == Coast
+                push!(int.p.Es, (g_next - g_prev) * last_η + last(int.p.Es))
+            elseif int.p.current_phase == MaxB
+                # this is actually updating F_i for ζ
+                push!(int.p.Es, (g_next - g_prev) * (last_η + 1. - int.p.train.ρ)) + last(int.p.Es)
+            end
+        else
+            last_η = calculate_η(s, x, int, V)
+        end
+        @show last_η
+    end
+end
 
 r(v) = 1e-2 + 1.5e-5v^2
 ψ(v) = 3e-5v^3
@@ -109,10 +130,11 @@ prob = EETCProblem(;
     track = track2,
     current_phase = MaxP,
     initial_speed = V,
-    T = 1e3
+    T = 1e3,
+    Es = [-E(V, V)]
 )
 
-xspan = (1943.645, 3100.)
+xspan = (1942.77, 3100.)
 s0 = SA[0., V]
 odeprob = ODEProblem(_odefun, s0, xspan, prob;
     tstops = track2.x_gradient)
@@ -123,19 +145,51 @@ lowspeed_aff(int) = terminate!(int)
 lowspeed_cb = ContinuousCallback(lowspeed_cond, lowspeed_aff)
 
 # end after end of the steep section when hitting V
-
 targetspeed_cond(s, x, int) = s[2] - V
 targetspeed_aff(int) = terminate!(int)
 targetspeed_cb = ContinuousCallback(targetspeed_cond, targetspeed_aff; affect_neg! = nothing)
 
-callbacks = CallbackSet(lowspeed_cb, targetspeed_cb)
+# saving η
+function calculate_η(s, x, int, V)
+    v = s[2]
+    
+    ψ(v) = (int.p.train.r[2] + 2int.p.train.r[3]*v) * v^2
+    W = Roots.find_zero(v -> -ψ(V) + int.p.train.ρ*ψ(v), V)
+    E(V, v) = ψ(V)/v + OptimalTrainControl.r(int.p.train, v)
+
+    if int.p.current_phase == MaxP
+        val = (E(V, v) + last(int.p.Es)) / 
+            (int.p.train.U̅(v) - OptimalTrainControl.r(int.p.train, v) + g(int.p.track, x))
+        @show val
+    elseif int.p.current_phase == Coast
+        val = (E(V, v) + last(int.p.Es)) / 
+            (- OptimalTrainControl.r(int.p.train, v) + g(int.p.track, x))
+    elseif int.p.current_phase == MaxB
+        # have to calculate ζ, the Fs are also in the EETC.Es array
+        val = (int.p.train.ρ*E(W,v) + last(int.p.Es)) /
+            (int.p.train.U̲(v) - OptimalTrainControl.r(int.p.train, v) + g(int.p.train, x))
+        # η = ζ + ρ - 1
+        val += int.p.train.ρ - 1.
+    end
+    return val
+end
+saved_vals = SavedValues(Float64, Float64)  # time type, savedval type
+saving_cb = SavingCallback((s,x,int) -> calculate_η(s,x,int,V), saved_vals)
+
+tstops = copy(track2.x_gradient)
+push!(tstops, (clamp.(track2.x_gradient .- 1.0, 0., Inf))...) 
+
+updateEs_cb = FunctionCallingCallback(make_update_Es(0.); funcat = tstops[tstops .> 0.], func_start = false)
+
+callbacks = CallbackSet(lowspeed_cb, targetspeed_cb, updateEs_cb, saving_cb)
 
 odesol = OrdinaryDiffEq.solve(odeprob, Tsit5();
     callback = callbacks,
     d_discontinuities = track2.x_gradient,
+    tstops,
     dtmax = 10.)
 plot(odesol.t, odesol[2,:])
-
+@show prob.Es
 η = similar(odesol.t)
 
 Es = [-E(V, V)]
@@ -166,4 +220,36 @@ ylims!(0, 12)
 # What I need:
 #   - callback for transition from MaxP to Coast and vice versa with _neg
 #   - callback for transition from Coast to MaxB and vice versa with _neg
-#   - callback to automatically push! next E at the points of grade change
+#   x callback to automatically push! next E at the points of grade change
+#   x callback for saving adjoint variables at every timestep
+
+
+function cond_power2coast(s, x, int)
+    η = calculate_η(s, x, int, V)
+    η
+end
+
+function cond_coast2brake(s, x, int)
+    η = calculate_η(s, x, int, V)
+    η - (int.p.train.ρ - 1.)
+end
+
+aff_2coast!(int) = int.p.current_phase = Coast
+
+aff_2brake!(int) = int.p.current_phase = MaxB
+
+aff_2power!(int) = int.p.current_phase = MaxP
+
+function lastval(f::Function)
+    last = nothing
+    return (params) -> begin
+        if isnothing(last)
+            last = f(params)
+            println("1st")
+        else
+            last = sum(params) + last
+            println("2nd")
+        end
+        last
+    end
+end
