@@ -5,10 +5,30 @@ using Plots
 using Roots
 using StaticArrays
 
+function make_cond_power2coast(V)
+    return function cond_power2coast(s, x, int)
+        η = calculate_η(s, x, int, V)
+        η
+    end
+end
+
+function make_cond_coast2brake(V)
+    return function cond_coast2brake(s, x, int)
+        η = calculate_η(s, x, int, V)
+        η - (int.p.train.ρ - 1.)
+    end
+end
+
+aff_2coast!(int) = int.p.current_phase = Coast
+
+aff_2brake!(int) = int.p.current_phase == Coast ? int.p.current_phase = MaxB : nothing
+
+aff_2power!(int) = int.p.current_phase == Coast ? int.p.current_phase = MaxP : nothing
+
 function make_update_Es(first_η)
     last_η = first_η
     return function update_Es!(s, x, int)
-        @show x, last_η
+        # @show x, last_η
         if x in int.p.track.x_gradient
             g_prev = g(int.p.track, x - 1e-2)
             g_next = g(int.p.track, x + 1e-2)
@@ -21,7 +41,7 @@ function make_update_Es(first_η)
         else
             last_η = calculate_η(s, x, int, V)
         end
-        @show last_η
+        # @show last_η
     end
 end
 
@@ -109,19 +129,22 @@ end
 
 plot(odesol.t, η)
 
-##
+#
 
 function _odefun(s::A, p::EETCProblem, x::T) where {T<:Real, A<:AbstractArray{T,1}}
     t, v = s
 
     if p.current_phase == MaxP
         u = p.train.U̅(v)
+    elseif p.current_phase == Coast
+        u = 0.
     elseif p.current_phase == MaxB
         u = p.train.U̲(v)
     end
+    # @show u
 
     ds1 = 1/v
-    ds2 = (u - OptimalTrainControl.r(train, v) + OptimalTrainControl.g(p.track, x)) / v
+    ds2 = (u - OptimalTrainControl.r(p.train, v) + OptimalTrainControl.g(p.track, x)) / v
     SA[ds1, ds2]
 end
 
@@ -160,7 +183,7 @@ function calculate_η(s, x, int, V)
     if int.p.current_phase == MaxP
         val = (E(V, v) + last(int.p.Es)) / 
             (int.p.train.U̅(v) - OptimalTrainControl.r(int.p.train, v) + g(int.p.track, x))
-        @show val
+        # @show val
     elseif int.p.current_phase == Coast
         val = (E(V, v) + last(int.p.Es)) / 
             (- OptimalTrainControl.r(int.p.train, v) + g(int.p.track, x))
@@ -176,12 +199,19 @@ end
 saved_vals = SavedValues(Float64, Float64)  # time type, savedval type
 saving_cb = SavingCallback((s,x,int) -> calculate_η(s,x,int,V), saved_vals)
 
+powercoast_cb = ContinuousCallback(make_cond_power2coast(V),aff_2power!,
+    affect_neg! = aff_2coast!)
+
+coastbrake_cb = ContinuousCallback(make_cond_coast2brake(V), aff_2coast!,
+    affect_neg! = aff_2brake!)
+
 tstops = copy(track2.x_gradient)
 push!(tstops, (clamp.(track2.x_gradient .- 1.0, 0., Inf))...) 
 
 updateEs_cb = FunctionCallingCallback(make_update_Es(0.); funcat = tstops[tstops .> 0.], func_start = false)
 
-callbacks = CallbackSet(lowspeed_cb, targetspeed_cb, updateEs_cb, saving_cb)
+callbacks = CallbackSet(lowspeed_cb, targetspeed_cb, updateEs_cb, saving_cb, coastbrake_cb)
+# ,powercoast_cb, coastbrake_cb)
 
 odesol = OrdinaryDiffEq.solve(odeprob, Tsit5();
     callback = callbacks,
@@ -189,31 +219,32 @@ odesol = OrdinaryDiffEq.solve(odeprob, Tsit5();
     tstops,
     dtmax = 10.)
 plot(odesol.t, odesol[2,:])
-@show prob.Es
-η = similar(odesol.t)
+# @show prob.Es
+η = saved_vals.saveval
+plot(η)
 
-Es = [-E(V, V)]
-for k in eachindex(odesol.t)
-    v = odesol[2,k]
-    x = odesol.t[k]
+# Es = [-E(V, V)]
+# for k in eachindex(odesol.t)
+#     v = odesol[2,k]
+#     x = odesol.t[k]
 
-    if x in track2.x_gradient
-        # @show x
-        # η[k] = (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x-0.1))
-        # @show η[k]
-        push!(Es, (g(track2, x+1.0) - g(track2, x-1.0)) * η[k-1] + last(Es))
-        # @show (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x))
-        η[k] = (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x))
-    else
-        η[k] = (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x))
-    end
-end
-@show η[end]
-plot(odesol.t, η)
+#     if x in track2.x_gradient
+#         # @show x
+#         # η[k] = (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x-0.1))
+#         # @show η[k]
+#         push!(Es, (g(track2, x+1.0) - g(track2, x-1.0)) * η[k-1] + last(Es))
+#         # @show (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x))
+#         η[k] = (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x))
+#     else
+#         η[k] = (E(V, v) + last(Es)) / (train.U̅(v) - OptimalTrainControl.r(train, v) + g(track2, x))
+#     end
+# end
+# @show η[end]
+# plot(odesol.t, η)
 
-plot(η, odesol[2,:])
-xlims!(-5e-3, 5e-3)
-ylims!(0, 12)
+# plot(η, odesol[2,:])
+# xlims!(-5e-3, 5e-3)
+# ylims!(0, 12)
 
 ##
 
@@ -222,34 +253,3 @@ ylims!(0, 12)
 #   - callback for transition from Coast to MaxB and vice versa with _neg
 #   x callback to automatically push! next E at the points of grade change
 #   x callback for saving adjoint variables at every timestep
-
-
-function cond_power2coast(s, x, int)
-    η = calculate_η(s, x, int, V)
-    η
-end
-
-function cond_coast2brake(s, x, int)
-    η = calculate_η(s, x, int, V)
-    η - (int.p.train.ρ - 1.)
-end
-
-aff_2coast!(int) = int.p.current_phase = Coast
-
-aff_2brake!(int) = int.p.current_phase = MaxB
-
-aff_2power!(int) = int.p.current_phase = MaxP
-
-function lastval(f::Function)
-    last = nothing
-    return (params) -> begin
-        if isnothing(last)
-            last = f(params)
-            println("1st")
-        else
-            last = sum(params) + last
-            println("2nd")
-        end
-        last
-    end
-end

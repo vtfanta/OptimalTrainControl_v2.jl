@@ -9,6 +9,9 @@ include("track.jl")
 # Solving time-optimal (minimal time) train control
 include("time_optimal.jl")
 
+# Solving energy-optimal train control on a flat track
+include("optimal_flat.jl")
+
 # Solving energy-optimal train control
 include("optimal.jl")
 

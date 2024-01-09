@@ -2,6 +2,7 @@ using OrdinaryDiffEq
 
 export Mode, Train, Track, OTCSolution, TOTCProblem, EETCProblem
 export MaxP, HoldP, HoldR, Coast, MaxB
+export Port
 
 @enum Mode begin
     MaxP = 0
@@ -19,6 +20,9 @@ end
 end
 
 Train(U̅, U̲, r) = Train(U̅, U̲, r, 0)
+
+# To allow broadcasting
+Base.broadcastable(t::Train) = Ref(t)
 
 @kwdef mutable struct Track{T<:Real, G<:Union{Nothing, Vector{T}},
     S<:Union{Nothing, Vector{T}}}
