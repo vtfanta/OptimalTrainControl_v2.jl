@@ -67,7 +67,7 @@ end
 
     sol = solve(timeprob)
     T_end = sol.odesol.u[end][1]
-    @test isapprox(T_end, 31.41; atol=0.1)
+    @test isapprox(T_end, 53.149; atol=0.1)
 end
 
 @testset "Time-optimal train control, wavy track" begin
@@ -88,5 +88,5 @@ end
 
     sol = solve(timeprob)
 
-    @test isapprox(sol.odesol[1,end], 30.14; atol = 0.1)
+    @test isapprox(sol.odesol[1,end], 54.30; atol = 0.1)
 end

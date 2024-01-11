@@ -8,9 +8,9 @@ train = Train(
 )
 
 track = Track(
-    length = 300.,
+    length = 3e3,
     altitude = 100.,
-    x_gradient = [0.0, 100., 173.2],
+    x_gradient = [0.0, 1e3, 1.7e3],
     gradient = [2e-3, 0., 1e-3]
 )
 

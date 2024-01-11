@@ -28,11 +28,11 @@ function solve(p::TOTCProblem)
     # Find maximum acceleration trajectory from start;
     # find maximum deceleration trajectory from end;
     
-    s0 = SA{Float64}[0, 1]
+    s0 = SA{Float64}[0, 1.]
     maxtotcprob = TOTCProblem(p.train, p.track, MaxP)
     maxodeprob = ODEProblem(_odefun, s0, xspan, maxtotcprob)
 
-    s0 = SA{Float64}[0, 1]
+    s0 = SA{Float64}[0, 1.]
     mintotcprob = TOTCProblem(p.train, p.track, MaxB)
     minodeprob = ODEProblem(_odefun, s0, reverse(xspan), mintotcprob)
 
@@ -46,7 +46,7 @@ function solve(p::TOTCProblem)
     maxlastindex = searchsortedfirst(maxsol.t, x_switch)
     minfirstindex = searchsortedfirst(reverse(minsol.t), x_switch)
 
-    tmin = abs.(minsol[1,:])
+    tmin = reverse(minsol[1,:]) .- minimum(minsol[1,:]) .+ t_switch
     vmin = reverse(minsol[2,:])
 
     utot = maxsol.u[1:maxlastindex-1]

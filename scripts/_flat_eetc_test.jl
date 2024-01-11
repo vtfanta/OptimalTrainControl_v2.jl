@@ -1,7 +1,8 @@
 using OptimalTrainControl
+using Plots
 
 track = Track(
-    length = 10e3
+    length = 5e3
 )
 
 train = Train(
@@ -11,6 +12,8 @@ train = Train(
     0.6
 )
 
-T = 100. # seconds
-prob = EETCProblem(T, train, track, MaxP, 1.0, Float64[])
-OptimalTrainControl._solve(prob, 10.)
+T = 800. # seconds
+
+prob = EETCProblem(T, train, track)
+sol = solve(prob)
+plot(sol, label = false, xlabel = "Distance (m)", ylabel = "Speed (m/s)")
