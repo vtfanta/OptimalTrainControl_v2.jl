@@ -41,15 +41,16 @@ plot(sol)
 plot!(twinx(), track)
 ```
 ![TOTC Solution](/scripts/figures/totc_example.svg)
+
 The colours are showing the control mode which is currently engaged (green for maximum traction, red for maximum braking).
 
 # Energy-efficient Train Control Problem Example
 
 In contrast to the previous example, energy-efficient 
 train control (EETC) problems minimize the criterion
-$
+```math
 \mathrm{min}\ J=\mathrm{min} \int\limits_0^X \left( \frac{u+|u|}{2} + \rho\frac{u-|u|}{2} \right)\mathrm{d}x,
-$
+```
 where $x$ is the distance along the track, $u$ is traction effort of the train and $\rho\in[0,1]$ is the proportion of mechanical energy recovered during braking.
 The problem is to minimize the functional $J$ while also satisfying the requirement of the total journey time.
 
@@ -78,6 +79,7 @@ sol = solve(prob)
 plot(sol)
 ```
 ![EETC Solution](/scripts/figures/eetc_example.svg)
+
 The colours specify the currently engaged control mode (green for maximum traction, blue for cruising, gray for coasting and red for maximum braking).
 
 One can also inspect the optimal control signal throughout the trip:
