@@ -27,7 +27,7 @@ sol = solve(prob)
 plot(sol)
 plot!(twinx(), track)
 ```
-![TOTC Solution](../figures/totc_example.svg)
+![TOTC Solution](./assets/totc_example.svg)
 
 The colours are showing the control mode which is currently engaged (green for maximum traction, red for maximum braking).
 
@@ -65,7 +65,7 @@ prob = EETCProblem(T, train, track)
 sol = solve(prob)
 plot(sol)
 ```
-![EETC Solution](../figures/eetc_example.svg)
+![EETC Solution](./assets/eetc_example.svg)
 
 The colours specify the currently engaged control mode (green for maximum traction, blue for cruising, gray for coasting and red for maximum braking).
 
@@ -73,4 +73,4 @@ One can also inspect the optimal control signal throughout the trip:
 ```julia
 plot(sol.control, 0, track.length)
 ```
-![Optimal control](../figures/u.svg)
+![Optimal control](./assets/u.svg)
