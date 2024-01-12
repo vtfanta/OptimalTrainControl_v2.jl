@@ -2,13 +2,17 @@
 CurrentModule = OptimalTrainControl
 ```
 
-# OptimalTrainControl
+# OptimalTrainControl.jl Manual
 
-Documentation for [OptimalTrainControl](https://github.com/vtfanta/OptimalTrainControl.jl).
+[OptimalTrainControl](https://github.com/vtfanta/OptimalTrainControl.jl) is a package for
+optimal speed profile calculation for a single train on a given track.
 
-```@index
+This site serves as the main source of documentation for the package.
+
+# Installation
+
+The package can be installed by entering
+```julia
+using Pkg; Pkg.add(url="https://github.com/vtfanta/OptimalTrainControl_v2.jl")
 ```
-
-```@autodocs
-Modules = [OptimalTrainControl]
-```
+to the Julia REPL.

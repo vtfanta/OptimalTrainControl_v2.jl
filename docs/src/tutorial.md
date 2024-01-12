@@ -1,16 +1,3 @@
-# OptimalTrainControl
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://vtfanta.github.io/OptimalTrainControl_v2.jl/dev/)
-[![Build Status](https://github.com/vtfanta/OptimalTrainControl_v2.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/vtfanta/OptimalTrainControl_v2.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/vtfanta/OptimalTrainControl_v2.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/vtfanta/OptimalTrainControl_v2.jl)
-
-# Installation
-
-The package can be installed by entering
-```julia
-using Pkg; Pkg.add(url="https://github.com/vtfanta/OptimalTrainControl_v2.jl")
-```
-to the Julia REPL.
-
 # Time-Optimal Train Control (TOTC) Example
 Consider the problem of finding the time-optimal speed profile on a flat track of length $3\ \mathrm{km}$. At first we need to define a `Train` and a `Track` which will form the basis of our problem.
 
