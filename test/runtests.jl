@@ -51,9 +51,9 @@ end
 
 @testset "Time-optimal train control, flat track" begin
     train = Train(
-        v -> 3/v,
-        v -> -3/v,
-        (6.75e-3, 0., 5e-5)
+        U̅ = v -> 3/v,
+        U̲ = v -> -3/v,
+        r = (6.75e-3, 0., 5e-5)
     )
 
     track = Track(
@@ -72,9 +72,9 @@ end
 
 @testset "Time-optimal train control, wavy track" begin
     train = Train(
-            v -> 3/v,
-            v -> -3/v,
-            (6.75e-3, 0., 5e-5)
+            U̅ = v -> 3/v,
+            U̲ = v -> -3/v,
+            r = (6.75e-3, 0., 5e-5)
         )
 
     track = Track(
@@ -89,4 +89,22 @@ end
     sol = solve(timeprob)
 
     @test isapprox(sol.odesol[1,end], 54.30; atol = 0.1)
+end
+
+@testset "Energy-efficient train control, flat track" begin
+    T = 800.
+    
+    train = Train(
+            U̅ = v -> 3/v,
+            U̲ = v -> -3/v,
+            r = (6.75e-3, 0., 5e-5)
+        )
+
+    track = Track(length = 5e3)
+
+    prob = EETCProblem(; T, train, track)
+    sol = solve(prob)
+    
+    @test isapprox(sol.odesol[1,end], T; atol = 5.)
+    @test isapprox(sol.odesol[2,end], 1.; atol = 0.1)
 end

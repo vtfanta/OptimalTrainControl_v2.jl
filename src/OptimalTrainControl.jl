@@ -12,10 +12,10 @@ include("time_optimal.jl")
 # Solving energy-optimal train control on a flat track
 include("optimal_flat.jl")
 
-# Solving energy-optimal train control
-include("optimal.jl")
-
 # Plotting-related code
 include("plot_recipes.jl")
+
+# Precompilation
+include("precompile.jl")
 
 end

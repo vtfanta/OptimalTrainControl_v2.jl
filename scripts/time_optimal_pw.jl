@@ -2,9 +2,9 @@ using OptimalTrainControl
 using Plots
 
 train = Train(
-    v -> 3/v,
-    v -> -3/v,
-    (6.75e-3, 0., 5e-5)
+    U̅ =  v -> 3/v,
+    U̲ =  v -> -3/v,
+    r = (6.75e-3, 0., 5e-5)
 )
 
 track = Track(
