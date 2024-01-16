@@ -1,9 +1,21 @@
 export r, g, isvalidposition, gradient, speedlimit, altitude, segmentize!
 
+"""
+    r(train::Train, speed:Real)
+
+Return resistance specific force of `train` at given `speed`.
+
+The resistance specific force (per unit mass, i.e. acceleration) is positive and calculated as `train.r[1] + train.r[2] * v + train.r[3] * v^2`.
+"""
 function r(train::Train, v::T) where {T<:Real}
     train.r[1] + train.r[2] * v + train.r[3] * v^2
 end
 
+"""
+    g(track::Track, position::Real)
+
+Return gravitational acceleration component at `position` regarding the gradient of `track`.
+"""
 function g(track::Track, x::T) where {T<:Real}
     if !isvalidposition(track, x)
         throw(ArgumentError("Position $(x) out of bounds."))
@@ -12,6 +24,11 @@ function g(track::Track, x::T) where {T<:Real}
     -9.81 * sin(atan(gradient(track, x)))
 end
 
+"""
+    isvalidposition(track::Track, position::Real)
+
+Check if `position` is not out of bounds of the `track`.
+"""
 function isvalidposition(t::Track, position::T) where {T <: Real}
     if position < 0 || position > t.length
         return false
@@ -20,7 +37,7 @@ function isvalidposition(t::Track, position::T) where {T <: Real}
 end
 
 """
-    gradient(track, position)
+    gradient(track::Track, position::Real)
 
 Return gradient (in rise over run) at `position` on `track`.
 For example, a gradient of a segment which rises 10 metres over 100 metres
@@ -36,7 +53,7 @@ function gradient(t::Track, position::T) where {T <: Real}
 end
 
 """
-    speedlimit(track, position)
+    speedlimit(track::Track, position::Real)
 
 Return speedlimit (in metres per second) at `position` on `track`.
 """
@@ -50,7 +67,7 @@ function speedlimit(t::Track, position::T) where {T <: Real}
 end
 
 """
-    altitude(track, position)
+    altitude(track::Track, position::Real)
 
 Return altitude (in metres) at `position` on `track`.
 """
@@ -77,7 +94,7 @@ function altitude(t::Track, position::T) where {T <: Real}
 end
 
 """
-    segmentize!(track)
+    segmentize!(track::Track)
 
 Modify `track.x_segments` such that its elements mark starts of
 track parts on which both gradient and speed limit are constant.

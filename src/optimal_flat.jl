@@ -209,7 +209,13 @@ function _solve(p::EETCProblem{TV,S,U,Nothing,Nothing,VS}, V::A) where {TV, S, U
 
 end
 
-# solving EETC on a flat track without speed limits
+"""
+    solve(problem::EETCProblem)
+
+Compute `OTCSolution` of an energy-efficient train control `problem` on a flat track.
+
+See also [`EETCProblem`](@ref), [`OTCSolution`](@ref).
+"""
 function solve(p::EETCProblem{TV,S,U,Nothing,Nothing,VS}) where {TV,S,U,VS}
     # On a flat track, the mode sequence goes as MaxP -> (HoldP) -> Coast -> MaxB
 

@@ -3,6 +3,13 @@ using StaticArrays
 
 export solve
 
+"""
+    solve(problem::TOTCProblem)
+
+Compute `OTCSolution` of the time-optimal train control `problem`.
+
+See also [`TOTCProblem`](@ref), [`OTCSolution`](@ref).
+"""
 function solve(p::TOTCProblem)
     # Time-optimal solution consists of a MaxP phase followed by a MaxB phase.
     function _odefun(s::A, p::TOTCProblem, x::T) where {T<:Real, A<:AbstractArray{T,1}}
