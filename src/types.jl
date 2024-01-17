@@ -136,7 +136,7 @@ Formulate a time-optimal train control problem to be solved.
 - `train::Train`: vehicle specification for the problem.
 - `track::Track`: track specification for the problem
 - `current_phase::Mode = MaxP`: (mainly for internal purposes) starting control mode.
-- `initial_speed::Real = 1.`: starting speed; ``1 \`mathrm{m/s}`` is regarded as a stop.
+- `initial_speed::Real = 1.`: starting speed; ``1 \\mathrm{m/s}``  is regarded as a stop.
 """
 @kwdef mutable struct TOTCProblem{T,S,U,V<:AbstractFloat}
     train::Train{T,S}
@@ -158,7 +158,7 @@ Formulate an energy-efficient train control problem.
 - `train::Train`: train specification for the problem.
 - `track::Track`: track specification for the problem.
 - `current_phase::Mode = MaxP`: (mainly for internal purposes) starting control mode.
-- `initial_speed::Real = 1.`: starting speed; ``1 \`mathrm{m/s}`` is regarded as a stop.
+- `initial_speed::Real = 1.`: starting speed; ``1`` m/s is regarded as a stop.
 - `Es::Vector{Real} = []`: (internal) vector of shifting constants used for calculation of the adjoint variable trajectory.
 """
 @kwdef mutable struct EETCProblem{TV,S,U,TG,TS,V<:AbstractFloat,W<:AbstractFloat}

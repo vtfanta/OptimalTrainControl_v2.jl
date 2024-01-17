@@ -24,7 +24,7 @@ $v_i$ and $v_f$ have to be strictly positive (it is highly recommended to use va
 the state equations contain singularity at $v=0$. The control limits have to be monotone ($\overline{U}$ non-increasing,
 $\underbar{U}$ non-decreasing) with
 ```math
-\lim_{v\to\infty}\underbar{U}(v)=\lim_{v\to\infty}\overbar{U}(v) = 0.
+\lim_{v\to\infty}\underbar{U}(v)=\lim_{v\to\infty}\overline{U}(v) = 0.
 ```
 
 It can be shown that the optimal control is a switching control between a small number of modes: Maximum
